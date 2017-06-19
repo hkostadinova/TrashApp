@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/txtJulul1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ini Layout 1"
+        android:layout_centerHorizontal="true"/>
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="300dp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:visibility="gone" />
+
+
+
+    <Button
+        android:id="@+id/chooseBn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="none"
+        android:text="Insert"
+        android:layout_below="@+id/imageView"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/uploadBn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:layout_marginRight="19dp"
+        android:onClick="finalSelection"
+
+        android:text="Upload"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/InputNAME" />
+
+    <EditText
+        android:id="@+id/InputNAME"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name"
+        android:layout_alignBaseline="@+id/uploadBn"
+        android:layout_alignBottom="@+id/uploadBn"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/InputLat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/InputLag"
+        android:layout_alignEnd="@+id/chooseBn"
+        android:layout_alignRight="@+id/chooseBn"
+        android:text="TextView"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/InputLag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/uploadBn"
+        android:layout_marginBottom="17dp"
+        android:layout_toLeftOf="@+id/chooseBn"
+        android:layout_toStartOf="@+id/chooseBn"
+        android:text="TextView"
+        android:visibility="invisible" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/scrollView"
+        android:layout_below="@+id/imageView"
+        android:layout_toEndOf="@+id/imageView"
+        android:layout_above="@+id/uploadBn">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/linearMain"></LinearLayout>
+    </HorizontalScrollView>
+
+    <Button
+        android:id="@+id/pickerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chooseBn"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="25dp"
+        android:layout_toEndOf="@+id/txtJulul1"
+        android:text="Button" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chooseBn"
+        android:layout_marginEnd="38dp"
+        android:layout_toStartOf="@+id/InputLag"
+        android:text="TextView" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/pickerButton"
+        android:layout_toEndOf="@+id/imageView"
+        android:orientation="horizontal"
+        android:layout_marginTop="69dp"
+        android:id="@+id/radioGroup">
+
+        <RadioButton
+            android:id="@+id/radioButton15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="rbclick"
+            android:text="Small" />
+
+        <RadioButton
+            android:id="@+id/radioButton14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="rbclick"
+            android:text="Medium" />
+
+        <RadioButton
+            android:id="@+id/radioButton13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="rbclick"
+            android:text="Large" />
+
+    </RadioGroup>
+
+    <CheckBox
+        android:id="@+id/checkBox4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="CheckBox"
+        android:onClick="selectItem"
+        android:layout_below="@+id/radioGroup"
+        android:layout_toStartOf="@+id/textView2" />
+
+    <CheckBox
+        android:id="@+id/checkBox5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CheckBox"
+        android:onClick="selectItem"
+        android:layout_alignBaseline="@+id/checkBox4"
+        android:layout_alignBottom="@+id/checkBox4"
+        android:layout_toEndOf="@+id/uploadBn" />
+
+    <CheckBox
+        android:id="@+id/checkBox6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CheckBox"
+        android:onClick="selectItem"
+        android:layout_alignBaseline="@+id/checkBox5"
+        android:layout_alignBottom="@+id/checkBox5"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="9dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/pickerButton"
+        android:layout_marginTop="37dp"
+        android:layout_toStartOf="@+id/textView2"
+        android:text="TextView"
+        android:visibility="invisible" />
+
+</RelativeLayout>
