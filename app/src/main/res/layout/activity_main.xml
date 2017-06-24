@@ -1,57 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.administrator.tabzzf.MainActivity">
 
     <TabHost
         android:id="@+id/tabHost"
-        android:layout_width="368dp"
-        android:layout_height="495dp"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
+
         <LinearLayout
             android:id="@+id/line"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-
-                ></TabWidget>
-
+                android:layout_height="wrap_content"></TabWidget>
 
             <FrameLayout
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="@color/colorBack">
+
                 <include
                     android:id="@+id/layout1"
                     layout="@layout/layout_satu"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
                     ></include>
+
                 <include
                     android:id="@+id/layout2"
                     layout="@layout/layout_dua"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    ></include>
+                    android:layout_height="match_parent"></include>
+
                 <include
                     android:id="@+id/layout3"
                     layout="@layout/layout_trio"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    ></include>
+                    android:layout_height="match_parent"></include>
+
+                <!--New Add new fourth tab to test DB -->
+                <include
+                    android:id="@+id/layout4"
+                    layout="@layout/layout_fourth"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"></include>
+                <!--Ebd New -->
             </FrameLayout>
 
         </LinearLayout>
     </TabHost>
-    
+
 
 </RelativeLayout>
