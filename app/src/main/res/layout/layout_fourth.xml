@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.administrator.tabzzf.ActivityDua">
+
+    <EditText
+        android:id="@+id/InputTRASHNAME"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="NAME" />
+
+
+    <EditText
+        android:id="@+id/InputDESCRIPTION"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/InputTRASHNAME"
+        android:layout_below="@+id/InputTRASHNAME"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="DESCRIPTION" />
+
+    <RadioGroup
+        android:id="@+id/SelectSize"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/InputDESCRIPTION"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/ChooseSizeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Size: " />
+
+        <RadioButton
+            android:id="@+id/smallSizeRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Small" />
+
+        <RadioButton
+            android:id="@+id/mediumSizeRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/button_viewAll"
+            android:layout_alignTop="@+id/radioGroup"
+            android:layout_weight="1"
+            android:text="Medium" />
+
+        <RadioButton
+            android:id="@+id/largeSizeRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/button_viewAll"
+            android:layout_alignTop="@+id/radioGroup"
+            android:layout_weight="1"
+            android:text="Large" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/SelectIsCleaned"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/SelectSize"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/isCleanedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Is Cleaned: " />
+
+        <RadioButton
+            android:id="@+id/radioIsCleaned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="No" />
+
+        <RadioButton
+            android:id="@+id/radioIsNotCleaned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/button_viewAll"
+            android:layout_alignTop="@+id/radioGroup"
+            android:layout_weight="1"
+            android:text="Yes" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnIsCleanedDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SelectIsCleaned"
+        android:layout_centerHorizontal="true"
+        android:text="Is cleaned" />
+
+    <Button
+        android:id="@+id/btnSizeDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SelectIsCleaned"
+        android:layout_toEndOf="@+id/btnIsCleanedDisplay"
+        android:text="Size" />
+
+    <Button
+        android:id="@+id/button_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnSizeDisplay"
+        android:layout_centerHorizontal="true"
+        android:text="Add Data" />
+
+    <Button
+        android:id="@+id/button_viewAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button_add"
+        android:layout_centerHorizontal="true"
+        android:text="View All" />
+
+
+</RelativeLayout>
