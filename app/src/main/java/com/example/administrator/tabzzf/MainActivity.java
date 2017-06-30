@@ -2,12 +2,30 @@ package com.example.administrator.tabzzf;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Base64;
+import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -22,7 +40,12 @@ import android.widget.ScrollView;
 import android.widget.TabHost;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,9 +53,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
+
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -61,13 +87,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
+
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -93,35 +117,39 @@ import java.util.Map;
 
 import static com.example.administrator.tabzzf.R.id.imageView;
 import static com.example.administrator.tabzzf.R.id.scrollView;
+import static com.example.administrator.tabzzf.R.id.tabHost;
 import static com.example.administrator.tabzzf.R.id.webView1;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    private Button ChooseBn,UploadBn,Refresh;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+    private Button ChooseBn, UploadBn, Refresh;
     private final int IMG_REQUEST = 3;
     private Button button1;
-    private int a=1;
+    private int a = 1;
     private String KEY_IMAGE = "image";
     private String KEY_NAME = "name";
     private String KEY_LAT = "lat";
     private String KEY_LNG = "lng";
-    private String UploadUrl = "http://192.168.100.3/upload.php";
+    private String UploadUrl = "http://192.168.100.7/upload.php";
+    public static String BASE_URL = "http://192.168.100.3/upload3.php";
     private Bitmap bitmap;
     private EditText NAME;
     private TextView LAT;
     private TextView LNG;
     private ImageView imgView;
-
+    private ImageView imgView2;
+    private Bitmap[] bitmapArray = new Bitmap[5];
+    String filePath;
     RadioGroup rg;
     RadioButton rb;
 
     private Location mLocation;
     private LocationManager mLocationManager;
     private GoogleApiClient mGoogleApiClient;
-  //  private static final String TAG = "MainActivity";
+    //  private static final String TAG = "MainActivity";
     private LocationRequest mLocationRequest;
     private com.google.android.gms.location.LocationListener listener;
     private long UPDATE_INTERVAL = 2 * 1000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 20000; /* 2 sec */
+    private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     private LocationManager locationManager;
 
@@ -132,7 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final String TAG = this.getClass().getSimpleName();
 
     LinearLayout linearMain;
-
+    ArrayList<Uri> mUris = new ArrayList<>();
+    Uri muri;
     ArrayList<String> imageList = new ArrayList<>();
     ArrayList<String> selection = new ArrayList<>();
     TextView final_text;
@@ -143,161 +172,215 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
 
+    private static final int RQS_OPEN = 33;
+
+    Button buttonOpen;
+    private RecyclerView myRecyclerView;
+    private StaggeredGridLayoutManager staggeredGridLayoutManagerVertical;
+    private MyRecyclerViewAdapter myRecyclerViewAdapter;
+
+    //new Create DB object and layout to test the DB
+    private DBHelp trashTrackerDb;
+    EditText editName;
+    private EditText editDescription;
+    //Select Is Cleaned
+    private RadioGroup radioIsCleanedGroup;
+    private RadioButton radioCleanedButton;
+    private Button btnDisplayCleanedRadio;
+    //Select size
+    private RadioGroup radioSizeGroup;
+    private RadioButton radioSizeButton;
+    private Button btnDisplaySizeRadio;
+
+    private Button btnAddData;
+    private Button btnViewAll;
+
+    // JSON Node names
+    public static final int CONNECTION_TIMEOUT = 10000;
+    public static final int READ_TIMEOUT = 15000;
+    private static final String TAG_SUCCESS = "success";
+
+    //Http Request variables
+    double latitude = 0;
+    double longitude = 0;
+    int sizeID = 0;
+    byte isCleaned = 0;
+    String nameHolder, latitudeHolder, longitudeHolder, descriptionHolder, isCleanedHolder, sizeHolder;
+    Boolean CheckEditText;
+    ProgressDialog progressDialog;
+    String finalResult;
+    HashMap<String, String> hashMap = new HashMap<>();
+    HttpParse httpParse = new HttpParse();
+    String HttpURL = "http://lowcarbeconomy.eu/trashtrackerapp/create_trash.php";
+    //end new
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
+
+
+        myRecyclerView = (RecyclerView) findViewById(R.id.myrecyclerview);
+        staggeredGridLayoutManagerVertical =
+                new StaggeredGridLayoutManager(
+                        1, //The number of ROWS in the grid
+                        LinearLayoutManager.HORIZONTAL);
+        myRecyclerViewAdapter = new MyRecyclerViewAdapter(this);
+        myRecyclerView.setAdapter(myRecyclerViewAdapter);
+        myRecyclerView.setLayoutManager(staggeredGridLayoutManagerVertical);
+        int spaceInPixels = -100;
+        myRecyclerView.addItemDecoration(new RecyclerViewItemDecorator(spaceInPixels));
+
+
         ChooseBn = (Button) findViewById(R.id.chooseBn);
+        imgView2 = (ImageView) findViewById(R.id.imageView2);
 
         UploadBn = (Button) findViewById(R.id.uploadBn);
 
-        rg=(RadioGroup) findViewById(R.id.radioGroup);
+        rg = (RadioGroup) findViewById(R.id.radioGroup);
 
 
         final WebView webview = (WebView) findViewById(R.id.webView1);
         webview.setWebViewClient(new WebViewClient());
         webview.getSettings().setJavaScriptEnabled(true);
         webview.clearCache(true);
-
-
+        Display display = getWindowManager().getDefaultDisplay();
+        int width = display.getWidth();
 
         webview.loadUrl("http://192.168.100.3/index.html");
 
         TabHost tab = (TabHost) findViewById(R.id.tabHost);
         tab.setup();
-        TabHost.TabSpec spec1=tab.newTabSpec("TAB 1");
-        spec1.setIndicator("TAB 1");
+        tab.getTabWidget().setStripEnabled(false);
+        //  tab.getTabWidget().setRightStripDrawable(R.drawable.line) ;
+        //  tab.getTabWidget().setLeftStripDrawable(R.drawable.line);
+
+
+        TabHost.TabSpec spec1 = tab.newTabSpec("TAB 1");
+
+
+        tab.setPadding(0, 0, 0, 0);
+
+        spec1.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_dialer));
         spec1.setContent(R.id.layout1);
         tab.addTab(spec1);
 
         TabHost.TabSpec spec2 = tab.newTabSpec("TAB 2");
-        spec2.setIndicator("TAB 2");
+        spec2.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_dialer2));
+
         spec2.setContent(R.id.layout2);
         tab.addTab(spec2);
         TabHost.TabSpec spec3 = tab.newTabSpec("TAB 3");
-        spec3.setIndicator("TAB 3");
+        spec3.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_dialer3));
         spec3.setContent(R.id.layout3);
         tab.addTab(spec3);
 
+        //new
+        //Add new fourth tab with Title List (I didn't change the icon :-)) to test DB
+        TabHost.TabSpec spec4 = tab.newTabSpec("TAB 4");
+        spec4.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_dialer3));
+        spec4.setContent(R.id.layout4);
+        tab.addTab(spec4);
+        //End new
 
 
-        final_text=(TextView) findViewById(R.id.textView4);
+        tab.getTabWidget().getChildAt(0).setLayoutParams(new
+                LinearLayout.LayoutParams(1, 200, 1));
+        tab.getTabWidget().getChildAt(0).getLayoutParams().height = (int) (100 * this.getResources().getDisplayMetrics().density);
+        //   tab.getTabWidget().getChildAt(0).getLayoutParams().width = (int) (350 * this.getResources().getDisplayMetrics().density);
+        tab.getTabWidget().getChildAt(0).setBackgroundColor(Color.rgb(88, 89, 91));
+        tab.getTabWidget().getChildAt(1).setBackgroundColor(Color.rgb(88, 89, 91));
+        tab.getTabWidget().getChildAt(2).setBackgroundColor(Color.rgb(88, 89, 91));
+        tab.getTabWidget().getChildAt(1).setLayoutParams(new
+                LinearLayout.LayoutParams(1, 200, 1));
+        tab.getTabWidget().getChildAt(1).getLayoutParams().height = (int) (100 * this.getResources().getDisplayMetrics().density);
+        //   tab.getTabWidget().getChildAt(1).getLayoutParams().width = (int) (350 * this.getResources().getDisplayMetrics().density);
+        tab.getTabWidget().getChildAt(2).setLayoutParams(new
+                LinearLayout.LayoutParams(1, 200, 1));
+        tab.getTabWidget().getChildAt(2).getLayoutParams().height = (int) (100 * this.getResources().getDisplayMetrics().density);
+        //  tab.getTabWidget().getChildAt(2).getLayoutParams().width = (int) (350* this.getResources().getDisplayMetrics().density);
+
+
+        final_text = (TextView) findViewById(R.id.textView4);
 
         NAME = (EditText) findViewById(R.id.InputNAME);
-        LAT= (TextView)findViewById(R.id.InputLag);
-        LNG = (TextView)findViewById(R.id.InputLat);
+        LAT = (TextView) findViewById(R.id.InputLag);
+        LNG = (TextView) findViewById(R.id.InputLat);
         imgView = (ImageView) findViewById(R.id.imageView);
 
-     /*   mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
 
-        mLocationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE); */
+        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-      //  checkLocation(); //check whether location service is enable or not in your  phone
+        checkLocation(); //check whether location service is enable or not in your  phone
 
-        linearMain = (LinearLayout)findViewById(R.id.linearMain);
+        //linearMain = (LinearLayout)findViewById(R.id.linearMain);
 
-        galleryPhoto = new GalleryPhoto(getApplicationContext());
+//new
+        addListenerOnIsCleanedButton();
+        addListenerOnSizeButton();
+        trashTrackerDb = new DBHelp(this);
 
+        editName = (EditText) findViewById(R.id.InputTRASHNAME);
+        editDescription = (EditText) findViewById(R.id.InputDESCRIPTION);
+        radioIsCleanedGroup = (RadioGroup) findViewById(R.id.SelectIsCleaned);
+        radioSizeGroup = (RadioGroup) findViewById(R.id.SelectSize);
+
+        btnAddData = (Button) findViewById(R.id.button_add);
+        btnViewAll = (Button) findViewById(R.id.button_viewAll);
+        AddData();
+        viewAll();
+        //end new
 
 
         ChooseBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = galleryPhoto.openGalleryIntent();
-                in.setType("image/*");
+                //Open multi-type using Intent.ACTION_OPEN_DOCUMENT
+                //Open multi-file
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(intent, RQS_OPEN);
 
-                in.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(in, GALLERY_REQUEST);
+                Toast.makeText(MainActivity.this,
+                        "Single-selection: Tap on any file.\n" +
+                                "Multi-selection: Tap & Hold on the first file, " +
+                                "tap for more, tap on OPEN to finish.",
+                        Toast.LENGTH_LONG).show();
 
             }
         });
-
-
-        final MyCommand myCommand = new MyCommand(getApplicationContext());
-
 
 
         UploadBn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                for (String imagePath : imageList) {
+            public void onClick(View view) {
+                if (muri != null) {
+                    Toast.makeText(getApplicationContext(), "Image  selected!", Toast.LENGTH_LONG).show();
+                    // String zaza=getPath(muri);
+                    //    imageUpload(zaza);
+                    //  imageSHOW(bitmapArray[1]);
+                    imageUpload();
 
-                        String final_fruit_selection = "";
-                        for (String Selections : selection)
-                        {
-                            final_fruit_selection=final_fruit_selection+Selections+", ";
-                        }
-                        final_text.setText(final_fruit_selection);
-
-
-
-                    try {
-
-
-                        Bitmap bitmap = PhotoLoader.init().from(imagePath).requestSize(500, 500).getBitmap();
-                         final String encodedString = ImageBase64.encode(bitmap);
-
-                        String url = "http://192.168.100.3/upload.php";
-                       StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                          @Override
-                           public void onResponse(String response) {
-                                Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
-                            }
-                        }, new Response.ErrorListener() {
-                           @Override
-                          public void onErrorResponse(VolleyError error) {
-                              Toast.makeText(getApplicationContext(), "Error while uploading image", Toast.LENGTH_SHORT).show();
-                           }
-                        }){
-                            String name = NAME.getText().toString().trim();
-                            String lat =LAT.getText().toString().trim();
-                            String lng = LNG.getText().toString().trim();
-                            @Override
-                            protected Map<String, String> getParams() throws AuthFailureError {
-                                Map<String, String> params = new HashMap<>();
-
-                                    String Key_image="image"+String.valueOf(a);
-                                    params.put(Key_image, encodedString);
-
-                                    params.put(KEY_NAME, name);
-                                    params.put(KEY_LAT, lat);
-                                    params.put(KEY_LNG, lng);
-                                    params.put("radio", String.valueOf(rb.getText()));
-                                params.put("special", String.valueOf(final_text.getText()));
-                                return params;
-
-                            }
-
-                        };
-
-
-                        myCommand.add(stringRequest);
-
-                    } catch (FileNotFoundException e) {
-                        Toast.makeText(getApplicationContext(), "Error while loading image", Toast.LENGTH_SHORT).show();
-                    }
-
+                } else {
+                    Toast.makeText(getApplicationContext(), "Image not selected!", Toast.LENGTH_LONG).show();
                 }
-
-
-                myCommand.execute();
-                NAME.setText("");
-                imageList.clear();
-                linearMain.removeAllViews();
-                webview.reload();
-
-
 
             }
 
-        });
 
+        });
 
 
         mAddress = (TextView) findViewById(R.id.textView2);
@@ -307,6 +390,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 try {
+
                     PlacePicker.IntentBuilder intentBuilder =
                             new PlacePicker.IntentBuilder();
                     intentBuilder.setLatLngBounds(BOUNDS_MOUNTAIN_VIEW);
@@ -320,30 +404,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
+
+    private void imageSHOW(Bitmap imagePat3h) {
+        imgView2.setImageBitmap(imagePat3h);
+    }
+
+    private void imageUpload() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, UploadUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String Response = jsonObject.getString("response");
+                            Toast.makeText(MainActivity.this, Response, Toast.LENGTH_LONG).show();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("name", NAME.getText().toString().trim());
+                params.put("lat", LAT.getText().toString().trim());
+                params.put("lng", LNG.getText().toString().trim());
+                params.put("image1", imageToString(bitmapArray[0]));
+                params.put("image2", imageToString(bitmapArray[1]));
+                params.put("image3", imageToString(bitmapArray[2]));
+                params.put("image4", imageToString(bitmapArray[3]));
+
+                // params.put("image5",imageToString(bitmapArray[4]));
+
+
+                return params;
+            }
+        };
+        MySingleton.getInstance(MainActivity.this).addToRequestQueue(stringRequest);
+
+    }
+
+
     public void selectItem(View view) {
         boolean checked = ((CheckBox) view).isChecked();
         switch (view.getId()) {
             case R.id.checkBox4:
                 if (checked) {
                     selection.add("apple");
-                } else
-                {
+                } else {
                     selection.remove("apple");
                 }
                 break;
             case R.id.checkBox5:
                 if (checked) {
                     selection.add("orange");
-                } else
-                {
+                } else {
                     selection.remove("orange");
                 }
                 break;
             case R.id.checkBox6:
                 if (checked) {
                     selection.add("grapes");
-                } else
-                {
+                } else {
                     selection.remove("grapes");
                 }
                 break;
@@ -352,33 +481,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK){
-            if(requestCode == GALLERY_REQUEST){
-                galleryPhoto.setPhotoUri(data.getData());
-                String photoPath = galleryPhoto.getPath();
-                imageList.add(photoPath);
-                Log.d(TAG, photoPath);
-                try {
-                    Bitmap bitmap = PhotoLoader.init().from(photoPath).requestSize(320, 180).getBitmap();
-
-                    ImageView imageView = new ImageView(getApplicationContext());
-                    LinearLayout.LayoutParams layoutParams =
-                            new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.MATCH_PARENT);
-                    imageView.setLayoutParams(layoutParams);
-                    imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    imageView.setPadding(0, 0, 0, 10);
-                    imageView.setAdjustViewBounds(true);
 
 
-                    imageView.setImageBitmap(bitmap);
-                    linearMain.addView(imageView);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == RQS_OPEN) {
 
-                } catch (FileNotFoundException e) {
-                    Toast.makeText(getApplicationContext(), "Error while loading image", Toast.LENGTH_SHORT).show();
+                ClipData clipData = data.getClipData();
+
+                if (clipData == null) {
+                    muri = data.getData();
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), muri);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    myRecyclerViewAdapter.add(
+                            myRecyclerViewAdapter.getItemCount(),
+                            data.getData());
+                } else {
+
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
+                        ClipData.Item item = clipData.getItemAt(i);
+                        Uri uri = item.getUri();
+                        try {
+                            Bitmap bitmap3;
+                            bitmap3 = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                            bitmapArray[i] = bitmap3;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        muri = uri;
+
+                        //s += uri.toString() + "\n";
+                        myRecyclerViewAdapter.add(
+                                myRecyclerViewAdapter.getItemCount(),
+                                uri);
+
+
+                    }
                 }
+
             }
+
         }
+
         if (requestCode == PLACE_PICKER_REQUEST
                 && resultCode == Activity.RESULT_OK) {
 
@@ -395,8 +541,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 attributions = "";
             }
 
-          mAddress.setText(address);
-          LAT.setText(String.valueOf(location2));
+            mAddress.setText(address);
+            LAT.setText(String.valueOf(location2));
             LNG.setText(String.valueOf(location));
 
         } else {
@@ -404,8 +550,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
-
     }
+
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -414,22 +560,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivityForResult(intent, IMG_REQUEST);
     }
 
+    private String getPath(Uri contentUri) {
+        String[] proj = {MediaStore.Images.Media.DATA};
+        CursorLoader loader = new CursorLoader(getApplicationContext(), contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
+    }
+
     @Override
     public void onClick(View v) {
 
 
-
-
     }
+
     public class Image {
         public String imageString;
         public String name;
         public double lat, lng;
     }
-    public void rbclick(View v){
-        int radiobuttonid=rg.getCheckedRadioButtonId();
-        rb=(RadioButton) findViewById(radiobuttonid);
-        Toast.makeText(getBaseContext(),rb.getText(),Toast.LENGTH_LONG).show();
+
+    public void rbclick(View v) {
+        int radiobuttonid = rg.getCheckedRadioButtonId();
+        rb = (RadioButton) findViewById(radiobuttonid);
+        Toast.makeText(getBaseContext(), rb.getText(), Toast.LENGTH_LONG).show();
+    }
+
+    public class RecyclerViewItemDecorator extends RecyclerView.ItemDecoration {
+        private int spaceInPixels;
+
+        public RecyclerViewItemDecorator(int spaceInPixels) {
+            this.spaceInPixels = spaceInPixels;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view,
+                                   RecyclerView parent, RecyclerView.State state) {
+            outRect.left = spaceInPixels;
+            outRect.right = spaceInPixels;
+            outRect.bottom = spaceInPixels;
+
+            if (parent.getChildLayoutPosition(view) == 0) {
+                outRect.top = spaceInPixels;
+            } else {
+                outRect.top = 0;
+            }
+        }
     }
 
  /*  @Override
@@ -508,21 +687,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         requestQueue.add(stringRequest);
     }*/
 
-  /*  private String imageToString(Bitmap bitmap) {
+    private String imageToString(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, byteArrayOutputStream);
         byte[] imgBytes = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(imgBytes, Base64.DEFAULT);
 
 
     }
-
-
-
-
-
-
-
 
 
     @Override
@@ -542,11 +714,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        if(mLocation == null){
+        if (mLocation == null) {
             startLocationUpdates();
         }
         if (mLocation != null) {
-
+            LAT.setText(String.valueOf(mLocation.getLatitude()));
             // mLatitudeTextView.setText(String.valueOf(mLocation.getLatitude()));
             //mLongitudeTextView.setText(String.valueOf(mLocation.getLongitude()));
         } else {
@@ -606,20 +778,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onLocationChanged(Location location) {
 
-      /*  String msg = "Updated Location: " +
+        String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
+
         LAT.setText(String.valueOf(location.getLatitude()));
-        LNG.setText(String.valueOf(location.getLongitude() ));
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        LNG.setText(String.valueOf(location.getLongitude()));
+
         // You can now create a LatLng Object for use with maps
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         LAT.setText(String.valueOf(location.getLatitude()));
-        LNG.setText(String.valueOf(location.getLongitude() ));
+        LNG.setText(String.valueOf(location.getLongitude()));
     }
 
     private boolean checkLocation() {
-        if(!isLocationEnabled())
+        if (!isLocationEnabled())
             showAlert();
         return isLocationEnabled();
     }
@@ -652,10 +825,218 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
-   public void goToMap(View view) {
-       Intent intent= new Intent(MainActivity.this, ActivityDua.class);
+    public void goToMap(View view) {
+        Intent intent = new Intent(MainActivity.this, ActivityDua.class);
         startActivity(intent);
     }
 
-*/
+    //new
+    //Adding Data to Trash Table in the DB
+    public void AddData() {
+        btnAddData.setOnClickListener(
+                new View.OnClickListener() {
+                    //TODO insert array of images!!!
+                    @Override
+                    public void onClick(View v) {
+                        //TODO get the current location, if the User didn't select it
+
+                        if (!LAT.getText().toString().equals("TextView") || !LNG.getText().toString().equals("TextView")) {
+                            latitude = Double.parseDouble(LAT.getText().toString());
+                            longitude = Double.parseDouble(LNG.getText().toString());
+                        }
+
+                        int isCleanedSelectedId = radioIsCleanedGroup.getCheckedRadioButtonId();
+                        int sizeSelectedId = radioSizeGroup.getCheckedRadioButtonId();
+                        radioSizeButton = (RadioButton) findViewById(sizeSelectedId);
+                        radioCleanedButton = (RadioButton) findViewById(isCleanedSelectedId);
+
+                        //TODO get size by radioButton id, not by radioButton text
+                        //  int sizeID = 0;
+                        if (radioSizeButton.getText().toString().equals("Medium")) {
+                            sizeID = 1;
+                        } else if (radioSizeButton.getText().toString().equals("Large")) {
+                            sizeID = 2;
+                        }
+
+                        // byte isCleaned = 0;
+                        if (radioCleanedButton.getText().toString().equals("Yes")) {
+                            isCleaned = 1;
+                        }
+                        //Http Request
+                        CheckEditTextIsEmptyOrNot();
+
+                        if (CheckEditText) {
+                            // If EditText is not empty and CheckEditText = True then this block will execute.
+                            TrashRegistration(editName.getText().toString(), Double.toString(latitude), Double.toString(longitude),
+                                    editDescription.getText().toString(), Byte.toString(isCleaned), Integer.toString(sizeID));
+                        } else {
+                            // If EditText is empty then this block will execute .
+                            Toast.makeText(MainActivity.this, "Please fill all form fields.", Toast.LENGTH_LONG).show();
+                        }
+
+                        boolean isInserted = trashTrackerDb.insertDataIntoTrashTable(editName.getText().toString(), editDescription.getText().toString(),
+                                latitude, longitude, isCleaned, sizeID);
+
+                        if (isInserted == true)
+                            Toast.makeText(MainActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+    }
+
+    public void TrashRegistration(final String Trash_Name, final String Latitude, final String Longitude,
+                                  final String Trash_Description, final String IsCleaned, final String Trash_Size) {
+
+        class TrashRegistrationClass extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog = ProgressDialog.show(MainActivity.this, "Loading Data", null, true, true);
+            }
+
+            @Override
+            protected void onPostExecute(String httpResponseMsg) {
+                super.onPostExecute(httpResponseMsg);
+
+                progressDialog.dismiss();
+                Toast.makeText(MainActivity.this, httpResponseMsg.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                hashMap.put("Name", params[0]);
+                hashMap.put("Latitude", params[1]);
+                hashMap.put("Longitude", params[2]);
+                hashMap.put("Description", params[3]);
+                hashMap.put("IsCleaned", params[4]);
+                hashMap.put("Size_idSize", params[5]);
+
+                finalResult = httpParse.postRequest(hashMap, HttpURL);
+
+                return finalResult;
+            }
+        }
+
+        TrashRegistrationClass trashRegistrationClass = new TrashRegistrationClass();
+
+        trashRegistrationClass.execute(Trash_Name, Latitude, Longitude, Trash_Description, IsCleaned, Trash_Size);
+    }
+
+    public void CheckEditTextIsEmptyOrNot() {
+
+        nameHolder = editName.getText().toString();
+        latitudeHolder = LAT.getText().toString();
+        longitudeHolder = LNG.getText().toString();
+        descriptionHolder = editDescription.getText().toString();
+
+        if (TextUtils.isEmpty(nameHolder) || TextUtils.isEmpty(descriptionHolder)) {
+            CheckEditText = false;
+        } else {
+            CheckEditText = true;
+        }
+
+    }
+
+    //Show all the data stored in Trash Table in the DB
+
+    public void viewAll() {
+        btnViewAll.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Sqlite
+                        Cursor res = trashTrackerDb.getAllDataFromTrashTable();
+                        if (res.getCount() == 0) {
+                            // show message
+                            showMessage("Error", "Nothing found");
+                            return;
+                        }
+
+                        StringBuffer buffer = new StringBuffer();
+                        while (res.moveToNext()) {
+                            buffer.append("Id :" + res.getString(0) + "\n");
+                            buffer.append("Name :" + res.getString(1) + "\n");
+                            buffer.append("Lat :" + res.getString(2) + "\n");
+                            buffer.append("Long :" + res.getString(3) + "\n");
+                            buffer.append("Desc :" + res.getString(4) + "\n");
+                            buffer.append("IsCleaned :" + res.getString(5) + "\n");
+                            buffer.append("Size :" + res.getString(6) + "\n\n");
+                        }
+                        // Show all data
+                        showMessage("Data", buffer.toString());
+
+                        //Http Request
+                        Intent intent = new Intent(getApplicationContext(), ShowAllTrashesActivity.class);
+                        startActivity(intent);
+
+
+                    }
+                }
+        );
+    }
+
+    public void showMessage(String title, String Message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(Message);
+        builder.show();
+    }
+
+    //Check selected Is Cleaned
+    public void addListenerOnIsCleanedButton() {
+        radioIsCleanedGroup = (RadioGroup) findViewById(R.id.SelectIsCleaned);
+        btnDisplayCleanedRadio = (Button) findViewById(R.id.btnIsCleanedDisplay);
+
+        btnDisplayCleanedRadio.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                // get selected radio button from radioGroup
+                int selectedId = radioIsCleanedGroup.getCheckedRadioButtonId();
+
+                // find the radiobutton by returned id
+                radioCleanedButton = (RadioButton) findViewById(selectedId);
+
+                Toast.makeText(MainActivity.this,
+                        radioCleanedButton.getText() + " " + Integer.toString(selectedId), Toast.LENGTH_SHORT).show();
+
+            }
+
+        });
+
+    }
+
+    //Check selected Size
+    public void addListenerOnSizeButton() {
+        radioSizeGroup = (RadioGroup) findViewById(R.id.SelectSize);
+        btnDisplaySizeRadio = (Button) findViewById(R.id.btnSizeDisplay);
+
+        btnDisplaySizeRadio.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                // get selected radio button from radioGroup
+                int selectedId = radioSizeGroup.getCheckedRadioButtonId();
+
+                // find the radiobutton by returned id
+                radioSizeButton = (RadioButton) findViewById(selectedId);
+
+                Toast.makeText(MainActivity.this,
+                        radioSizeButton.getText() + " " + Integer.toString(selectedId) + " " + String.valueOf(radioSizeButton.getId()), Toast.LENGTH_SHORT).show();
+
+            }
+
+        });
+
+    }
+    //end new
+
+
 }
