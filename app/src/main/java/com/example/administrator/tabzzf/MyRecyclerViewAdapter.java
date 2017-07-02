@@ -60,8 +60,8 @@ public class MyRecyclerViewAdapter extends
     private Bitmap loadScaledBitmap(Uri src) throws FileNotFoundException {
 
         // required max width/height
-        final int REQ_WIDTH = 400;
-        final int REQ_HEIGHT = 400;
+        final int REQ_WIDTH = 150;
+        final int REQ_HEIGHT = 150;
 
         Bitmap bm = null;
 
@@ -138,17 +138,19 @@ public class MyRecyclerViewAdapter extends
             super(cView);
             cardView = cView;
             this.parent = parent;
-            textItemUri = (TextView) cardView.findViewById(R.id.item_uri);
+
             imageView = (ImageView) cardView.findViewById(R.id.item_image);
         }
 
         public void setItemUri(CharSequence name){
-            textItemUri.setText(name);
+            //textItemUri.setText(name);
         }
 
         public void setImageView(Bitmap bitmap){
             imageView.setImageBitmap(bitmap);
+            imageView.setAdjustViewBounds(true);
         }
+
 
     }
 }

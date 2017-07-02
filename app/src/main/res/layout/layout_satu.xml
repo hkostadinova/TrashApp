@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:scrollbars="vertical">
-    <TextView
-        android:id="@+id/txtJulul1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ini Layout 1"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="30dp"
@@ -17,7 +10,7 @@
 
         android:layout_height="10dp"
         android:layout_below="@+id/imageView4"
-        android:layout_toEndOf="@+id/imageView2" />
+        android:layout_marginLeft="40dp" />
 
 
     <ImageView
@@ -26,116 +19,119 @@
         android:layout_height="4.90dp"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
-
+        android:layout_marginTop="5dp"
 
         android:src="@drawable/line3"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="5dp"
+
         android:layout_alignParentStart="true" />
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginTop="10dp"
+    android:fillViewport="true">
+
+<RelativeLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:scrollbars="vertical">
+
+    <EditText
+        android:id="@+id/InputNAME"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/linearLayout"
+        android:ems="20"
+        android:hint="Name"
+        android:layout_alignParentTop="true"
+        android:inputType="textMultiLine"
+        android:textColor="@android:color/white" />
+
+    <EditText
+        android:id="@+id/InputDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/InputNAME"
+        android:ems="20"
+        android:hint="Description"
+
+        android:inputType="textMultiLine"
+        android:textColor="@android:color/white" />
 
     <Button
         android:id="@+id/chooseBn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="none"
+
         android:text="Insert"
-        android:layout_below="@+id/imageView"
-        android:layout_alignParentEnd="true" />
 
-    <Button
-        android:id="@+id/uploadBn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
-        android:layout_marginRight="19dp"
-        android:onClick="finalSelection"
 
-        android:text="Upload"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/InputNAME" />
+        android:layout_marginTop="88dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:id="@+id/pickerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/chooseBn"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="25dp"
-        android:layout_toEndOf="@+id/txtJulul1"
-        android:text="Button" />
 
-    <EditText
-        android:id="@+id/InputNAME"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
+        android:text="Location"
         android:layout_alignBaseline="@+id/uploadBn"
         android:layout_alignBottom="@+id/uploadBn"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_toEndOf="@+id/textView2" />
 
     <TextView
         android:id="@+id/InputLat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/InputLag"
-        android:layout_alignEnd="@+id/chooseBn"
-        android:layout_alignRight="@+id/chooseBn"
+        android:layout_below="@+id/relativity"
+        android:layout_marginLeft="250dp"
         android:text="TextView"
-        android:visibility="visible" />
+        android:visibility="invisible" />
 
     <TextView
 
         android:id="@+id/InputLag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
+        android:layout_below="@+id/relativity"
+        android:layout_marginLeft="300dp"
         android:text="TextView"
-        android:visibility="visible"
-        android:layout_above="@+id/linearLayout"
-        android:layout_toStartOf="@+id/InputLat" />
 
+        android:visibility="invisible" />
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_height="112dp"
-        android:layout_marginBottom="60dp"
-        android:layout_above="@+id/uploadBn"
-        android:id="@+id/linearLayout">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/myrecyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="112dp" />
-    </LinearLayout>
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/chooseBn"
-        android:layout_marginEnd="38dp"
-        android:layout_toStartOf="@+id/InputLag"
-        android:text="TextView" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="38dp" />
 
     <RadioGroup
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="20dp"
         android:layout_below="@+id/pickerButton"
         android:layout_toEndOf="@+id/imageView"
         android:orientation="horizontal"
-        android:layout_marginTop="69dp"
-        android:id="@+id/radioGroup">
+        android:layout_marginTop="20dp"
+        android:id="@+id/radioGroup"
+        android:layout_alignParentStart="true">
 
         <RadioButton
             android:id="@+id/radioButton15"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:checked="true"
             android:onClick="rbclick"
             android:text="Small" />
 
@@ -157,57 +153,182 @@
             android:text="Large" />
 
     </RadioGroup>
-
+<RelativeLayout
+    android:layout_width="300dp"
+    android:layout_centerHorizontal="true"
+    android:layout_height="190dp"
+    android:id="@+id/relativity"
+    android:layout_marginTop="24dp"
+    android:layout_below="@+id/radioGroup">
     <CheckBox
-        android:id="@+id/checkBox4"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
 
+
+
+        android:id="@+id/checkBox4"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
         android:onClick="selectItem"
         android:background="@drawable/checkbox_background2"
         android:button="@null"
-        android:layout_below="@+id/radioGroup"
-      />
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/checkBox8"
+        android:layout_marginEnd="10dp" />
 
     <CheckBox
         android:id="@+id/checkBox5"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
         android:background="@drawable/checkbox_background2"
         android:button="@null"
         android:onClick="selectItem"
+        android:layout_centerHorizontal="true"
         android:layout_alignBaseline="@+id/checkBox4"
         android:layout_alignBottom="@+id/checkBox4"
-        android:layout_toEndOf="@+id/uploadBn" />
+         />
 
     <CheckBox
         android:id="@+id/checkBox6"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
         android:background="@drawable/checkbox_background2"
         android:button="@null"
         android:onClick="selectItem"
+
         android:layout_alignBaseline="@+id/checkBox5"
         android:layout_alignBottom="@+id/checkBox5"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="9dp" />
+        android:layout_toRightOf="@+id/checkBox5"
+        android:layout_toEndOf="@+id/checkBox5"
+        android:layout_marginStart="10dp"
+
+        />
+    <CheckBox
+        android:id="@+id/checkBox7"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:background="@drawable/checkbox_background2"
+        android:button="@null"
+        android:onClick="selectItem"
+
+
+        android:layout_below="@+id/checkBox4"
+        android:layout_alignLeft="@+id/checkBox4"
+        android:layout_alignStart="@+id/checkBox4"
+        />
+    <CheckBox
+        android:id="@+id/checkBox8"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:background="@drawable/checkbox_background2"
+        android:button="@null"
+        android:onClick="selectItem"
+
+
+        android:layout_below="@+id/checkBox5"
+        android:layout_alignLeft="@+id/checkBox5"
+        android:layout_alignStart="@+id/checkBox5"
+        />
+    <CheckBox
+        android:id="@+id/checkBox9"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:background="@drawable/checkbox_background2"
+        android:button="@null"
+        android:onClick="selectItem"
+
+
+        android:layout_below="@+id/checkBox6"
+        android:layout_alignLeft="@+id/checkBox6"
+        android:layout_alignStart="@+id/checkBox6"
+
+        />
+    <CheckBox
+        android:id="@+id/checkBox10"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:background="@drawable/checkbox_background2"
+        android:button="@null"
+        android:onClick="selectItem"
+
+
+        android:layout_below="@+id/checkBox7"
+        android:layout_alignLeft="@+id/checkBox7"
+        android:layout_alignStart="@+id/checkBox7"
+        />
+    <CheckBox
+        android:id="@+id/checkBox11"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:background="@drawable/checkbox_background2"
+        android:button="@null"
+        android:onClick="selectItem"
+
+
+        android:layout_below="@+id/checkBox8"
+        android:layout_alignLeft="@+id/checkBox8"
+        android:layout_alignStart="@+id/checkBox8"
+        />
+    <CheckBox
+        android:id="@+id/checkBox12"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:background="@drawable/checkbox_background2"
+        android:button="@null"
+        android:onClick="selectItem"
+
+
+        android:layout_below="@+id/checkBox9"
+        android:layout_alignLeft="@+id/checkBox9"
+        android:layout_alignStart="@+id/checkBox9"
+     />
+</RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBack"
+        android:layout_below="@+id/relativity"
+
+        >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/myrecyclerview"
+
+            android:background="@color/colorBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/pickerButton"
-        android:layout_marginTop="37dp"
-        android:layout_toStartOf="@+id/textView2"
         android:text="TextView"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:layout_above="@+id/radioGroup"
+     />
 
-    <ImageView
-        android:id="@+id/imageView2"
+    <Button
+        android:id="@+id/uploadBn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/pickerButton"
-        android:layout_toStartOf="@+id/uploadBn"
-        app:srcCompat="@drawable/cast_abc_scrubber_control_to_pressed_mtrl_005" />
+        android:onClick="finalSelection"
 
+        android:text="Upload"
+
+        android:layout_above="@+id/textView2"
+        android:layout_toStartOf="@+id/pickerButton" />
+
+</RelativeLayout>
+</ScrollView>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="176dp"
+        android:layout_marginStart="745dp"
+        android:text="Button" />
 </RelativeLayout>

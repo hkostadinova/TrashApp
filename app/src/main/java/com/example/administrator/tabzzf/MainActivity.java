@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MyRecyclerViewAdapter myRecyclerViewAdapter;
 
     //new Create DB object and layout to test the DB
-    private DBHelp trashTrackerDb;
+    // private DBHelp trashTrackerDb;
     EditText editName;
     private EditText editDescription;
     //Select Is Cleaned
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         ChooseBn = (Button) findViewById(R.id.chooseBn);
-        imgView2 = (ImageView) findViewById(R.id.imageView2);
+        //imgView2 = (ImageView) findViewById(R.id.imageView2);
 
         UploadBn = (Button) findViewById(R.id.uploadBn);
 
@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //new
         addListenerOnIsCleanedButton();
         addListenerOnSizeButton();
-        trashTrackerDb = new DBHelp(this);
+        //    trashTrackerDb = new DBHelp(this);
 
         editName = (EditText) findViewById(R.id.InputTRASHNAME);
         editDescription = (EditText) findViewById(R.id.InputDESCRIPTION);
@@ -874,13 +874,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this, "Please fill all form fields.", Toast.LENGTH_LONG).show();
                         }
 
-                        boolean isInserted = trashTrackerDb.insertDataIntoTrashTable(editName.getText().toString(), editDescription.getText().toString(),
-                                latitude, longitude, isCleaned, sizeID);
-
-                        if (isInserted == true)
-                            Toast.makeText(MainActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
-                        else
-                            Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG).show();
+//                        boolean isInserted = trashTrackerDb.insertDataIntoTrashTable(editName.getText().toString(), editDescription.getText().toString(),
+//                                latitude, longitude, isCleaned, sizeID);
+//
+//                        if (isInserted == true)
+//                            Toast.makeText(MainActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
+//                        else
+//                            Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG).show();
                     }
                 }
         );
@@ -949,25 +949,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v) {
                         //Sqlite
-                        Cursor res = trashTrackerDb.getAllDataFromTrashTable();
-                        if (res.getCount() == 0) {
-                            // show message
-                            showMessage("Error", "Nothing found");
-                            return;
-                        }
-
-                        StringBuffer buffer = new StringBuffer();
-                        while (res.moveToNext()) {
-                            buffer.append("Id :" + res.getString(0) + "\n");
-                            buffer.append("Name :" + res.getString(1) + "\n");
-                            buffer.append("Lat :" + res.getString(2) + "\n");
-                            buffer.append("Long :" + res.getString(3) + "\n");
-                            buffer.append("Desc :" + res.getString(4) + "\n");
-                            buffer.append("IsCleaned :" + res.getString(5) + "\n");
-                            buffer.append("Size :" + res.getString(6) + "\n\n");
-                        }
-                        // Show all data
-                        showMessage("Data", buffer.toString());
+//                        Cursor res = trashTrackerDb.getAllDataFromTrashTable();
+//                        if (res.getCount() == 0) {
+//                            // show message
+//                            showMessage("Error", "Nothing found");
+//                            return;
+//                        }
+//
+//                        StringBuffer buffer = new StringBuffer();
+//                        while (res.moveToNext()) {
+//                            buffer.append("Id :" + res.getString(0) + "\n");
+//                            buffer.append("Name :" + res.getString(1) + "\n");
+//                            buffer.append("Lat :" + res.getString(2) + "\n");
+//                            buffer.append("Long :" + res.getString(3) + "\n");
+//                            buffer.append("Desc :" + res.getString(4) + "\n");
+//                            buffer.append("IsCleaned :" + res.getString(5) + "\n");
+//                            buffer.append("Size :" + res.getString(6) + "\n\n");
+//                        }
+//                        // Show all data
+//                        showMessage("Data", buffer.toString());
 
                         //Http Request
                         Intent intent = new Intent(getApplicationContext(), ShowAllTrashesActivity.class);
